@@ -35,7 +35,7 @@ Example usage:
   f.write(c.snapshot_jpeg)
   f.close
   
-For more information about using a Camera object, see the AxisNetcam::Camera RDocs.
+For more information about using the Camera class, see the AxisNetcam::Camera RDocs.
 
 
 ------
