@@ -1,0 +1,3 @@
+=== 0.1.0 :: 2007-07-26
+
+* First public release.
