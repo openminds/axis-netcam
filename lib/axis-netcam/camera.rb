@@ -20,6 +20,9 @@ module AxisNetcam
   # AxisNetcam::Camera::Users :: for user management
   # AxisNetcam::Camera::Video :: for obtaining video/image data
   # AxisNetcam::Camera::Info :: for diagnostic/status information
+  #
+  # Note that by default, AxisNetcam::Camera will log quite verbosely to stdout.
+  # See AxisNetcam::Camera#new for info on how to change this behaviour.
   class Camera
     
     # The HTTP network connection to the camera.
@@ -29,7 +32,8 @@ module AxisNetcam
     
     # Create a new Camera object.
     # Options must include a :hostname, :username, and :password.
-    # A :logger object can also be specified, otherwise logging will be done to STDOUT.
+    # A Logger object can also be specified to the :logger option, otherwise 
+    # logging will be done to STDOUT.
     def initialize(options)
       @hostname = options[:hostname] or raise(ArgumentError, "Must specify a hostname")
       @username = options[:username] or raise(ArgumentError, "Must specify a username")
