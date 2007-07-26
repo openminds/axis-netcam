@@ -17,6 +17,10 @@ from  Axis Communications.</b>
 Note that only a subset of the full Axis API is currently implemented, but the most
 useful functionality is in place.
 
+To install (using RubyGems[http://rubygems.org/read/chapter/3]):
+
+  gem install axis-netcam
+
 Example usage:
 
   require 'rubygems' # (if installed as a gem)
