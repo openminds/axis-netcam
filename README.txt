@@ -19,6 +19,9 @@ useful functionality is in place.
 
 Example usage:
 
+  require 'rubygems' # (if installed as a gem)
+  require 'axis-netcam'
+  
   c = AxisNetcam::Camera.new(:hostname => '192.168.2.25', 
         :username => 'root', :password => 'pass')
   c.tilt(90)
