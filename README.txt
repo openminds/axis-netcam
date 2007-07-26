@@ -11,7 +11,11 @@ You can contact the author at:
   matt at roughest dot net
   
 
-<b>AxisNetcam provides a Ruby interface for interacting with network cameras from  Axis Communications.</b>
+<b>AxisNetcam provides a Ruby interface for interacting with network cameras
+from  Axis Communications.</b>
+
+Note that only a subset of the full Axis API is currently implemented, but the most
+useful functionality is in place.
 
 Example usage:
 
