@@ -21,12 +21,12 @@ HOMEPATH = "http://axis-netcam.rubyforge.org"
 
 NAME = "axis-netcam"
 REV = nil # UNCOMMENT IF REQUIRED: File.read(".svn/entries")[/committed-rev="(d+)"/, 1] rescue nil
-VERS = ENV['VERSION'] || (Axis-netcam::VERSION::STRING + (REV ? ".#{REV}" : ""))
+VERS = ENV['VERSION'] || (AxisNetcam::VERSION::STRING + (REV ? ".#{REV}" : ""))
                           CLEAN.include ['**/.*.sw?', '*.gem', '.config']
 RDOC_OPTS = ['--quiet', '--title', "axis-netcam documentation",
     "--opname", "index.html",
     "--line-numbers", 
-    "--main", "README",
+    "--main", "README.txt",
     "--inline-source"]
 
 class Hoe

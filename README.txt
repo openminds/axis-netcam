@@ -1,17 +1,33 @@
-=== RubyCAS-Server ===========================================================
+= AxisNetcam
 
-Copyright 2007 Urbacon Ltd.
+<i>Copyright 2007 Urbacon Ltd.</i>
 
-For info and installation instructions please see:
+For info and downloads please see:
 
-  http://code.google.com/p/rubycas-server/
+  http://rubyforge.org/projects/axis-netcam/
 
 You can contact the author at:
 
-  matt@roughest.net
+  matt at roughest dot net
+  
+
+<b>AxisNetcam provides a Ruby interface for interacting with network cameras from  Axis Communications.</b>
+
+Example usage:
+
+  c = AxisNetcam::Camera.new(:hostname => '192.168.2.25', 
+        :username => 'root', :password => 'pass')
+  c.tilt(90)
+  c.zoom(500)
+  f = File.open('/tmp/test.jpg', 'wb')
+  f.bin
+  f.write(c.snapshot_jpeg)
+  f.close
+  
+For more information about using a Camera object, see the AxisNetcam::Camera RDocs.
 
 
-==============================================================================
+------
 
 axis-netcam is free software; you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by
