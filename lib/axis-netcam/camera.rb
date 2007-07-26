@@ -8,7 +8,7 @@ module AxisNetcam
   # To control a camera, first create an instance of a Camera object and then call
   # its methods. For example:
   #
-  #   require 'axis-netcam'
+  #   require 'axis-netcam/camera'
   #
   #   c = AxisNetcam::Camera.new(:hostname => '192.168.2.25', 
   #         :username => 'root', :password => 'pass')
