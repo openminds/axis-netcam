@@ -47,7 +47,7 @@ module AxisNetcam
   class Camera
     
     # The HTTP network connection to the camera.
-    @@http = nil
+    @http = nil
     
     attr_reader :hostname, :logger
     
@@ -139,16 +139,41 @@ module AxisNetcam
       #    'MinZoom' => "1",
       #    'MaxZoom' => "19999"}
       #
-      # Note that the limit values assume that your camera's image is not
+      # The pan and tilt limit values assume that your camera's image is not
       # rotated. If you want to use these values in <tt>ptz</tt> calls
       # and your image is configured to be rotated, then you should also
-      # specify <tt>:imagerotation => 0</tt> as one of your arguments
+      # specify <tt>:imagerotation => 0</tt> as one of your parameters
       # to <tt>ptz</tt>. For example:
       #
       #   limits = c.get_ptz_limits
       #   c.ptz(:tilt => limits['MaxTilt'], :imagerotation => 0)
-      def get_ptz_limits
-        get_parameters("PTZ.Limit.L1")
+      #
+      # Alternatively, you can specify a +rotation+ argument. This will
+      # automatically adjust the returned pan and tilt values to match
+      # the given rotation. You can also specify :auto instead of providing
+      # a numeric value, in which case the system will try to fetch
+      # the rotation value for you (but be careful, because this can slow
+      # things down, since the camera must be queried first).
+      def get_ptz_limits(rotation = nil)
+        l = get_parameters("PTZ.Limit.L1")
+        return l unless rotation
+        
+        rotation = get_current_image_rotation if rotation == :auto
+        
+        # TODO: this only works for the 0, 90, 180, 270 rotations but not arbitrary values
+        case rotation
+        when 90
+          l['MinPan'], l['MaxPan'], l['MinTilt'], l['MaxTilt'] =
+          l['MinTilt'], l['MaxTilt'], l['MinPan'], l['MaxPan']
+        when 180
+          l['MinPan'], l['MaxPan'], l['MinTilt'], l['MaxTilt'] =
+          l['MinPan'], l['MaxPan'], l['MaxTilt']*-1, l['MinTilt']*-1
+        when 270
+          l['MinPan'], l['MaxPan'], l['MinTilt'], l['MaxTilt'] =
+          l['MinTilt'], l['MaxTilt'], l['MinPan']*-1, l['MaxPan']*-1
+        end
+        
+        l
       end
       
       # Points the camera at the given preset.
@@ -166,17 +191,17 @@ module AxisNetcam
         @log.info("Starting camera calibration...")
         
         pos = get_position
-        limits = get_ptz_limits
+        limits = get_ptz_limits(:auto)
         
         zoom(limits['MinZoom'])
         sleep(5)
-        ptz(:pan => limits['MinPan'], :tilt => limits['MinTilt'], :imagerotation => 0)
+        ptz(:pan => limits['MinPan'], :tilt => limits['MinTilt'])
         sleep(5)
-        ptz(:pan => limits['MinPan'], :tilt => limits['MaxTilt'], :imagerotation => 0)
+        ptz(:pan => limits['MinPan'], :tilt => limits['MaxTilt'])
         sleep(5)
-        ptz(:pan => limits['MaxPan'], :tilt => limits['MaxTilt'], :imagerotation => 0)
+        ptz(:pan => limits['MaxPan'], :tilt => limits['MaxTilt'])
         sleep(5)
-        ptz(:pan => limits['MaxPan'], :tilt => limits['MinTilt'], :imagerotation => 0)
+        ptz(:pan => limits['MaxPan'], :tilt => limits['MinTilt'])
         sleep(5)
         
         ptz(pos)
@@ -306,6 +331,16 @@ module AxisNetcam
         end
         "http://#{hostname}/axis-cgi/mjpg/video.cgi?resolution=#{resolution}&text=0"
       end
+      
+      # Returns the current image rotation setting.
+      def get_current_image_rotation
+        v = get_parameters("Image.I0.Appearance.Rotation")
+        if v && v["Image.I0.Appearance.Rotation"]
+          v["Image.I0.Appearance.Rotation"]
+        else
+          nil
+        end
+      end
     end
     include Video
     
@@ -344,7 +379,7 @@ module AxisNetcam
         }
         params['group'] = group if group
         
-        response = axis_action("view/param.cgi", params)
+        response = axis_action("admin/param.cgi", params)
         
         if response =~ /Error -1 getting param in group '.*?'!/
           raise RemoteError, "There is no parameter group '#{group}' on this camera."
@@ -471,16 +506,16 @@ module AxisNetcam
           Timeout.timeout(15) do
             req = Net::HTTP::Get.new(cmd_uri)
             
-    #        if @@http && @@http.active?
-    #          @log.debug "AXIS REMOTE API reusing HTTP connection #{@@http}"
-    #          http = @@http
-    #        else
+            if @http && @http.active?
+              @log.debug "AXIS REMOTE API reusing HTTP connection #{@http}"
+              http = @http
+            else
               @log.debug "AXIS REMOTE API opening new HTTP connection to '#{hostname}'"
               http = Net::HTTP.start(hostname)
               http.read_timeout = 15 # wait 15 seconds for camera to respond, then give up
               http.open_timeout = 15
-    #          @@http = http
-    #        end
+              @http = http
+            end
             
             req.basic_auth @username, @password
             
