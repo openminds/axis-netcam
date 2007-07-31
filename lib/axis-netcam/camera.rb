@@ -82,7 +82,7 @@ module AxisNetcam
         tilt = str[1].split("=").last
         zoom = str[2].split("=").last
         
-        {:pan => pan, :tilt => tilt, :zoom => zoom}
+        {:pan => pan.to_f, :tilt => tilt.to_f, :zoom => zoom.to_i}
       end
       
       # Simultanously pans, tilts, and zooms the camera.
