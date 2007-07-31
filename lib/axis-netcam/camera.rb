@@ -78,11 +78,11 @@ module AxisNetcam
       def get_position
         raw = axis_action("com/ptz.cgi", {'query' => 'position'})
         str = raw.split
-        pan = str[0].split("=").last
-        tilt = str[1].split("=").last
-        zoom = str[2].split("=").last
+        pan = str[0].split("=").last.to_f
+        tilt = str[1].split("=").last.to_f
+        zoom = str[2].split("=").last.to_i
         
-        {:pan => pan.to_f, :tilt => tilt.to_f, :zoom => zoom.to_i}
+        {:pan => pan, :tilt => tilt, :zoom => zoom}
       end
       
       # Simultanously pans, tilts, and zooms the camera.
