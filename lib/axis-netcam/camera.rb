@@ -128,8 +128,60 @@ module AxisNetcam
         positions
       end
       
+      # Returns a hash with info about the camera's point-tilt-zoom limits.
+      #
+      # The returned hash will look something like:
+      #
+      #   {'MinPan' => "-169",
+      #    'MaxPan' => "169",
+      #    'MinTilt' => "-90",
+      #    'MaxTilt' => "10",
+      #    'MinZoom' => "1",
+      #    'MaxZoom' => "19999"}
+      #
+      # Note that the limit values assume that your camera's image is not
+      # rotated. If you want to use these values in <tt>ptz</tt> calls
+      # and your image is configured to be rotated, then you should also
+      # specify <tt>:imagerotation => 0</tt> as one of your arguments
+      # to <tt>ptz</tt>. For example:
+      #
+      #   limits = c.get_ptz_limits
+      #   c.ptz(:tilt => limits['MaxTilt'], :imagerotation => 0)
+      def get_ptz_limits
+        get_parameters("PTZ.Limit.L1")
+      end
+      
+      # Points the camera at the given preset.
       def point_at_preset_name(preset_name)
         axis_action("com/ptz.cgi", {'gotoserverpresetname' => preset_name})
+      end
+      
+      # Tries to 'calibrate' the camera by rotating to all extremes.
+      #
+      # This may be useful when the camera is shifted by some external
+      # force and looses its place. Running the calibration should reset 
+      # things so that the camera's absolute point and tilt co-ordinates are
+      # consistent relative to the camera's base.
+      def calibrate
+        @log.info("Starting camera calibration...")
+        
+        pos = get_position
+        limits = get_ptz_limits
+        
+        zoom(limits['MinZoom'])
+        sleep(5)
+        ptz(:pan => limits['MinPan'], :tilt => limits['MinTilt'], :imagerotation => 0)
+        sleep(5)
+        ptz(:pan => limits['MinPan'], :tilt => limits['MaxTilt'], :imagerotation => 0)
+        sleep(5)
+        ptz(:pan => limits['MaxPan'], :tilt => limits['MaxTilt'], :imagerotation => 0)
+        sleep(5)
+        ptz(:pan => limits['MaxPan'], :tilt => limits['MinTilt'], :imagerotation => 0)
+        sleep(5)
+        
+        ptz(pos)
+        
+        @log.info("Finished camera calibration.")
       end
     end
     include PTZ
@@ -260,6 +312,75 @@ module AxisNetcam
     # Functionality related to obtaining information about the camera, such as its
     # status, model number, etc.
     module Info
+      # Returns a hash enumerating the camera's various parameters.
+      # The +group+ parameter limits the returned values to the given group.
+      # Note that if given, the group is removed from the parameter names.
+      #
+      # For example:
+      # 
+      #   c.get_parameters("PTZ.Limit")
+      #
+      # Returns:
+      #   
+      #  {"L1.MaxFocus"=>9999, "L1.MaxFieldAngle"=>50, "L1.MaxTilt"=>10, 
+      #   "L1.MinFieldAngle"=>1, "L1.MaxPan"=>169, "L1.MaxIris"=>9999, 
+      #   "L1.MaxZoom"=>19999, "L1.MinFocus"=>1, "L1.MinPan"=>-169, 
+      #   "L1.MinIris"=>1, "L1.MinZoom"=>1, "L1.MinTilt"=>-90}
+      #
+      # But the following:
+      #
+      #   c.get_parameters("PTZ.Limit.L1")
+      #
+      # Returns:
+      #
+      #   {"MaxIris"=>9999, "MaxZoom"=>19999, "MaxTilt"=>10, "MaxFocus"=>9999,
+      #    "MaxPan"=>169, "MinFieldAngle"=>1, "MinTilt"=>-90, "MinPan"=>-169, 
+      #    "MinIris"=>1, "MinZoom"=>1, "MinFocus"=>1, "MaxFieldAngle"=>50}
+      #
+      def get_parameters(group = nil)
+        params = {
+          'action' => 'list', 
+          'responseformat' => 'rfc'
+        }
+        params['group'] = group if group
+        
+        response = axis_action("view/param.cgi", params)
+        
+        if response =~ /Error -1 getting param in group '.*?'!/
+          raise RemoteError, "There is no parameter group '#{group}' on this camera."
+        end
+        
+        values = {}
+        response.each do |line|
+          k,v = line.split("=")
+          k.strip!
+          
+          if v.nil?
+            v = nil
+          else
+            case v.strip
+            when /^true$/
+              v = true
+            when /^false$/
+              v = false
+            when /^[-]?[0-9]+$/
+              v = v.to_i
+            when /^[-]?[0-9]+\.?[0-9]+$/
+              v = v.to_f
+            else
+              v = v.strip
+            end
+          end
+        
+          key = k.gsub(group ? "root.#{group}." : "root.", "")
+          
+          values[key] = v
+        end
+        
+        values
+      end
+      
+      
       # Returns the raw camera server report. 
       #
       # The report is a string with info about the camera's status and parameters,
@@ -286,13 +407,7 @@ module AxisNetcam
       
       # Returns the camera's model name.
       def model
-        begin
-          server_report =~ /prodshortname\s*=\s*"(.*?)"/i
-          $~[1]
-        rescue RemoteTimeout, RemoteError => e
-          @error = e
-          nil
-        end
+        extract_value_pairs_from_server_report(['prodshortname'])['prodshortname']
       end
       
       # Returns a code describing the camera's current status.
@@ -326,6 +441,7 @@ module AxisNetcam
           :error
         end
       end
+      alias status status_code
       
       # Returns the result of the status message resulting from the last 
       # status_code call. If no status message is available, status_code
@@ -396,6 +512,22 @@ module AxisNetcam
           @log.error err = "AXIS CAMERA #{hostname} TIMED OUT!"
           raise RemoteTimeout, err
         end
+      end
+      
+      def extract_value_pairs_from_server_report(keys)
+        values = {}
+        report = server_report
+        begin
+          keys.each do |k|
+            report =~ Regexp.new(%{#{k}\s*=\s*"(.*?)"}, "i")
+            values[k] = $~[1] if $~ && $~[1]
+          end
+        rescue RemoteTimeout, RemoteError => e
+          @error = e
+          nil
+        end
+        
+        values
       end
     
       # Raised when a Camera is instantiated with incorrect username and/or password.
