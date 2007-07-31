@@ -1,8 +1,7 @@
 #--
 # This file is part of axis-netcam.
 #
-# By Matt Zukowski <matt at roughest dot net>.
-# Copyright (2007) Urbacon Ltd.
+# Copyright (2007) Matt Zukowski <matt at roughest dot net>.
 # 
 # axis-netcam is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as published by
@@ -77,7 +76,8 @@ module AxisNetcam
       # viewing angle) and 10000 approaching a camera's maximum zoom. Again,
       # this depends on your camera's capabilities.
       def get_position
-        str = axis_action("com/ptz.cgi", {'query' => 'position'}).split
+        raw = axis_action("com/ptz.cgi", {'query' => 'position'})
+        str = raw.split
         pan = str[0].split("=").last
         tilt = str[1].split("=").last
         zoom = str[2].split("=").last
