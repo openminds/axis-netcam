@@ -1,5 +1,10 @@
 = AxisNetcam
 
+<b>AxisNetcam provides a Ruby interface for interacting with network cameras
+from  Axis Communications.</b>
+
+=== Copyright & Contact Info
+
 <i>Copyright 2007 Urbacon Ltd.</i>
 
 For info and downloads please see:
@@ -9,17 +14,24 @@ For info and downloads please see:
 You can contact the author at:
 
   matt at roughest dot net
-  
 
-<b>AxisNetcam provides a Ruby interface for interacting with network cameras
-from  Axis Communications.</b>
+=== Installation
+
+As a RubyGem[http://rubygems.org/read/chapter/3]):
+
+  gem install axis-netcam
+  
+As a plugin in a Rails application (this will install as an svn external,
+so your installation will be linked to the newest, bleeding-edge version
+of AxisNetcam):
+
+  cd <your Rails application's root directory>
+  ruby script/plugin install -x http://axis-netcam.rubyforge.org/svn/trunk/lib/axis-netcam
+
+=== Usage  
 
 Note that only a subset of the full Axis API is currently implemented, but the most
 useful functionality is in place.
-
-To install (using RubyGems[http://rubygems.org/read/chapter/3]):
-
-  gem install axis-netcam
 
 Example usage:
 
