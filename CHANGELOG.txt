@@ -1,3 +1,11 @@
+=== 0.2.0 :: In progress
+
+* Added methods for obtaining camera parameters and for calibrating the
+  camera's position.
+* The library can now be installed directly as a Rails plugin (instead
+  of installing as a RubyGem).
+* Added method for fetching the PTZ limits.
+
 === 0.1.0 :: 2007-07-26
 
 * First public release.
