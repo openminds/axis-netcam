@@ -169,6 +169,7 @@ module AxisNetcam
           l['MinPan'], l['MaxPan'], l['MinTilt'], l['MaxTilt'] =
           l['MinPan'], l['MaxPan'], l['MaxTilt']*-1, l['MinTilt']*-1
         when 270
+          # FIXME: This transformation appears to be busted :(
           l['MinPan'], l['MaxPan'], l['MinTilt'], l['MaxTilt'] =
           l['MinTilt'], l['MaxTilt'], l['MinPan']*-1, l['MaxPan']*-1
         end
