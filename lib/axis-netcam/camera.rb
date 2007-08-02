@@ -292,6 +292,7 @@ module AxisNetcam
       # Returns JPEG data with a snapshot of the current camera image.
       # size :: optionally specifies the image size -- one of :full, :medium, 
       #         or :thumbnail, or a string specifying the WxH dimensions like "640x480".
+      # options :: hash of additional options (if any) to send with the image request
       #
       # To dump the JPEG data to a file, you can do something like this:
       #
@@ -302,20 +303,23 @@ module AxisNetcam
       #   f.write(data)
       #   f.close
       #
-      def snapshot_jpeg(size = :full)
+      # The options hash can include parameters such as 'compression', 'rotation', 'date', etc.
+      # See http://www.axis.com/techsup/cam_servers/dev/cam_http_api_2.htm#api_blocks_image_video_jpeg_snapshot
+      # for more information.
+      def snapshot_jpeg(size = :full, options = {})
         case size
         when :thumbnail
           resolution = "160x120"
         when :medium
           resolution = "480x360"
         when :full
-          resolution = "640x480"
+          resolution = "704x480"
         else
           resolution = size
         end
         
         axis_action("jpg/image.cgi", 
-          {'resolution' => resolution, 'text' => '0'})
+          options.merge('resolution' => resolution))
       end
       
       # Returns the URI for accessing the camera's streaming Motion JPEG video.
