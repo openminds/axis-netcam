@@ -499,6 +499,10 @@ module AxisNetcam
     end
     include Info
     
+    def to_s
+      "#<#{self.class}:#{self.hostname}:#{self.object_id}>"
+    end
+    
     private
       # Executes an AXIS HTTP API call.
       # script :: the remote cgi script to call
