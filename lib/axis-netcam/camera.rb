@@ -500,7 +500,8 @@ module AxisNetcam
     include Info
     
     def to_s
-      "#<#{self.class}:#{self.hostname}:#{self.object_id}>"
+      s = super
+      s.gsub(">", %{ @hostname=#{hostname.inspect}>})
     end
     
     private
