@@ -196,15 +196,15 @@ module AxisNetcam
         
         zoom(limits['MinZoom'])
         (1..2).each do # do it twice, just to be safe...
-          sleep(5)
+          sleep(3)
           ptz(:pan => limits['MinPan'], :tilt => limits['MinTilt'])
-          sleep(5)
+          sleep(7)
           ptz(:pan => limits['MinPan'], :tilt => limits['MaxTilt'])
-          sleep(5)
+          sleep(7)
           ptz(:pan => limits['MaxPan'], :tilt => limits['MaxTilt'])
-          sleep(5)
+          sleep(7)
           ptz(:pan => limits['MaxPan'], :tilt => limits['MinTilt'])
-          sleep(5)
+          sleep(7)
         end
         
         ptz(pos)
