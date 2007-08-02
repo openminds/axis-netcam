@@ -5,6 +5,8 @@
 * The library can now be installed directly as a Rails plugin (instead
   of installing as a RubyGem).
 * Added method for fetching the PTZ limits.
+* snapshot_jpeg method now takes an optional hash of parameters to send
+  with the snapshot request.
 
 === 0.1.0 :: 2007-07-26
 
