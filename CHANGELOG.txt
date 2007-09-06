@@ -7,6 +7,10 @@
 * Added method for fetching the camera's PTZ limits.
 * snapshot_jpeg method now takes an optional hash of parameters to send
   with the snapshot request.
+* Added method to manually disconnect from the camera (i.e. close the http
+  connection).
+* The username is now logged in the action calls, along with the hostname
+  of the camera.
 
 === 0.1.0 :: 2007-07-26
 

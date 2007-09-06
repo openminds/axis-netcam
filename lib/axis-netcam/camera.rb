@@ -500,8 +500,17 @@ module AxisNetcam
     include Info
     
     def to_s
-      s = super
-      s.gsub(">", %{ @hostname=#{hostname.inspect}>})
+      "#<#{self.class}:#{self.hostname}:#{self.object_id}>"
+    end
+    
+    def disconnect
+      if @http && @http.active?
+        @log.debug "AXIS REMOTE API closing HTTP connection #{@http}"
+        @http.close
+        @http = nil
+      else
+        @log.warn "AXIS REMOTE API cannot disconnect because the HTTP connection is not open"
+      end
     end
     
     private
@@ -531,7 +540,7 @@ module AxisNetcam
             
             req.basic_auth @username, @password
             
-            @log.info "AXIS REMOTE API CALL [#{hostname}]: #{cmd_uri}"
+            @log.info "AXIS REMOTE API CALL [#{@username}@#{hostname}]: #{cmd_uri}"
             res = http.request(req)
             @log.debug "AXIS REMOTE API CALL FINISHED"
             

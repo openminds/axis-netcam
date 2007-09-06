@@ -3,9 +3,9 @@
 <b>AxisNetcam provides a Ruby interface for interacting with network cameras
 from  Axis Communications.</b>
 
-=== Copyright & Contact Info
-
 <i>Copyright 2007 Urbacon Ltd.</i>
+
+=== Contact Info
 
 For info and downloads please see:
 
