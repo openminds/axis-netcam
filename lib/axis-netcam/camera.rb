@@ -107,6 +107,12 @@ module AxisNetcam
         axis_action("com/ptz.cgi", {'pan'  => d})
       end
       
+      # Move the camera one 'tick' in the given direction.
+      # Possible values are 'up', 'down', 'left', 'right'
+      def move(direction)
+        axis_action("com/ptz.cgi", {'move' => direction})
+      end
+
       # Zooms the camera (in/out) to the given zoom factor.
       def zoom(n)
         axis_action("com/ptz.cgi", {'zoom'  => n})
