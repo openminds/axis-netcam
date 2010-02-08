@@ -1,4 +1,3 @@
-(in /Users/jan/Projects/RubyRails/axis-netcam)
 # -*- encoding: utf-8 -*-
 
 Gem::Specification.new do |s|
