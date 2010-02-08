@@ -32,6 +32,8 @@ of AxisNetcam):
   cd <your Rails application's root directory>
   ruby script/plugin install -x http://axis-netcam.rubyforge.org/svn/trunk/lib/axis-netcam
 
+<i>NOTE:</i> The plugin install instructions are out of date -- need to change this so that it uses De Poorter's new github repo.
+
 === Usage  
 
 Note that only a subset of the full Axis API is currently implemented, but the most
