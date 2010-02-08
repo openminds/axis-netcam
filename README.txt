@@ -11,6 +11,10 @@ For info and downloads please see:
 
   http://rubyforge.org/projects/axis-netcam/
 
+For source code:
+
+  http://github.com/DefV/axis-netcam
+
 You can contact the author at:
 
   matt at roughest dot net
